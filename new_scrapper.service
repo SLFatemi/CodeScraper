@@ -1,0 +1,15 @@
+[Unit]
+Description=Run new_scrapper.py for CodeScraper
+After=sql_script.service
+Requires=sql_script.service
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/root/Codescraper
+ExecStart=/root/Codescraper/venv/bin/python Melkradar/detector_scrapper/new_scrapper.py
+Restart=on-failure
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=multi-user.target
