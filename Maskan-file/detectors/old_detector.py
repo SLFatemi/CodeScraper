@@ -50,7 +50,7 @@ class MaskanHouse:
         self.url = links[0].get('onclick').split('(')[1][1:-2]
 
 def rabbit_publish(data):
-    connection = pika.BlockingConnection(pika.ConnectionParameters('rabbitmq'))
+    connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
     channel = connection.channel()
     channel.queue_declare(queue='detector_queue')
     channel.basic_publish(

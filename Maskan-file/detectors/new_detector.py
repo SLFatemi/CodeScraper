@@ -85,7 +85,7 @@ def get_new_data():
 
 
 def rabbit_publish(data):
-    connection = pika.BlockingConnection(pika.ConnectionParameters('rabbitmq'))
+    connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
     channel = connection.channel()
     channel.queue_declare(queue='detector_queue')
     channel.basic_publish(
