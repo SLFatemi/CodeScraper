@@ -1,0 +1,15 @@
+[Unit]
+Description=Run sql_script.py for CodeScraper
+After=network.target rabbitmq-server.service
+Wants=rabbitmq-server.service
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/root/Codescraper
+ExecStart=/root/Codescraper/venv/bin/python sql_script.py
+Restart=on-failure
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=multi-user.target

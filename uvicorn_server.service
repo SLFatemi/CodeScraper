@@ -1,0 +1,15 @@
+[Unit]
+Description=Run FastAPI Server with Uvicorn for CodeScraper
+After=new_scrapper.service
+Requires=new_scrapper.service
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/root/Codescraper
+ExecStart=/root/Codescraper/venv/bin/uvicorn Server-side.main:app --host 0.0.0.0 --port 8000
+Restart=on-failure
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=multi-user.target
