@@ -1,18 +1,24 @@
 # CodeScraper
 
-A modular real estate data collection, processing, and API serving platform.
 
-This project scrapes real estate listings from MelkRadar.com, processes and stores them in a MySQL database, and provides a REST API (using FastAPI) to access and analyze the listings. The data pipeline uses RabbitMQ for asynchronous task handling and messaging.
+For development Only
+
+A modular platform for real estate data collection, processing, and analysis. CodeScraper scrapes real estate listings from multiple sources, processes and stores them in a MySQL database, and exposes a REST API (via FastAPI) for querying and analysis. It also includes a modern web front-end for user interaction.
 
 ---
 
+## Security Notice
+
+**I'm aware that database connection details are present, This project is temporary and will be shut down (Development only)**  
+
 ## Features
 
-- **Data Scraping:** Collects real estate apartment and office data from MelkRadar.com via HTTP POST requests.
-- **Queue-Based Processing:** Uses RabbitMQ to publish and consume scraped data, enabling scalable and decoupled processing.
+- **Multi-source Data Scraping:** Collects real estate listings from MelkRadar.com and Maskan-file.ir.
+- **Queue-Based Processing:** Publishes scraped data to RabbitMQ for scalable, decoupled processing.
 - **Database Integration:** Stores listing data in a MySQL database with robust error handling.
-- **REST API:** Exposes endpoints via FastAPI to fetch and analyze stored listings.
-- **Containerized:** Easily deployable using Docker.
+- **REST API:** FastAPI backend provides endpoints to fetch and analyze listings.
+- **Interactive Web Front-End:** User-facing UI for submitting links and viewing similar listings.
+- **Containerized Deployment:** Easily run everything using Docker.
 
 ---
 
@@ -22,12 +28,20 @@ This project scrapes real estate listings from MelkRadar.com, processes and stor
 .
 ├── Melkradar/
 │   └── detector_scrapper/
-│       └── new_scrapper.py        # Scrapes and publishes new listings to RabbitMQ
+│       └── new_scrapper.py        # Scrapes MelkRadar.com, publishes to RabbitMQ
+├── Maskan-file/
+│   └── scrapper/
+│       └── scrapper.py            # Scrapes Maskan-file.ir (example process)
 ├── Server-side/
 │   └── main.py                    # FastAPI backend serving listing data
-├── sql_script.py                  # Consumes queue and inserts data into MySQL
+├── Front-end/
+│   ├── js/
+│   │   └── script.js              # Web app logic for searching and result display
+│   └── css/
+│       └── styles.css             # Styles for web UI
+├── sql_script.py                  # Consumes RabbitMQ, inserts listings into MySQL
 ├── requirements.txt               # Python dependencies
-├── Dockerfile                     # Container build file
+├── Dockerfile                     # Build & run all Python services
 └── README.md                      # You are here!
 ```
 
@@ -35,11 +49,11 @@ This project scrapes real estate listings from MelkRadar.com, processes and stor
 
 ## Prerequisites
 
-- **Docker** (recommended)  
+- **Docker** (recommended)
   or
 - Python 3.11+
 - MySQL database (with the `listings` table)
-- RabbitMQ server running locally or accessible from the container
+- RabbitMQ server (local or accessible)
 - Python dependencies from `requirements.txt`
 
 ---
@@ -61,9 +75,9 @@ docker run -p 8000:8000 codescraper
 ```
 
 *This will:*
-- Scrape new data from MelkRadar and publish to RabbitMQ (`new_scrapper.py`)
+- Scrape new data from MelkRadar and Maskan-file (see their scrapper scripts), publishing to RabbitMQ
 - Consume data from RabbitMQ and store in MySQL (`sql_script.py`)
-- Start FastAPI backend (port 8000)
+- Start FastAPI backend on port 8000
 
 ### 3. Manual Run (Advanced / Development)
 
@@ -71,10 +85,16 @@ Start dependencies (RabbitMQ, MySQL), then in three terminals:
 
 - **Data Scraper:**  
   `python Melkradar/detector_scrapper/new_scrapper.py`
+- **Maskan-file Scraper (optional):**  
+  `python Maskan-file/scrapper/scrapper.py`
 - **Consumer:**  
   `python sql_script.py`
 - **API Server:**  
   `uvicorn Server-side.main:app --reload`
+
+### 4. Front-end
+
+The web client is in `Front-end/`. Open `index.html` in your browser, or deploy the folder as a static website. It communicates with the FastAPI backend.
 
 ---
 
@@ -91,7 +111,7 @@ Update database and RabbitMQ connection parameters as needed in:
 After starting the server, access the FastAPI docs at:  
 `http://localhost:8000/docs`
 
-### Example endpoint
+#### Example endpoint
 
 - `POST /link`  
   **Body:**  
@@ -99,13 +119,13 @@ After starting the server, access the FastAPI docs at:
   { "link": "URL of the listing" }
   ```
   **Returns:**  
-  Top 10 similar listings (dummy implementation for now).
+  Top 10 similar listings (by similarity score).
 
 ---
 
 ## Database Schema
 
-Create the following table in MySQL:
+Create this table in your MySQL database:
 
 ```sql
 CREATE TABLE listings (
@@ -124,6 +144,14 @@ CREATE TABLE listings (
 
 ---
 
+## Front-end Usage
+
+- Input a listing URL in the search bar.
+- View top similar listings (with similarity percentage and details).
+- All logic for fetching, sorting, and displaying results is in `Front-end/js/script.js` and styled by `Front-end/css/styles.css`.
+
+---
+
 ## Contributing
 
 Contributions are welcome! Please open issues or pull requests for bug fixes, new features, or improvements.
@@ -138,15 +166,10 @@ MIT License
 
 ## Acknowledgments
 
-- [MelkRadar.com](https://melkradar.com) for data source
-- [Maskan-file.ir](https://maskan-file.ir) for data source
+- [MelkRadar.com](https://melkradar.com) and [Maskan-file.ir](https://maskan-file.ir) for data sources
 - [FastAPI](https://fastapi.tiangolo.com/)
 - [RabbitMQ](https://www.rabbitmq.com/)
 - [PyMySQL](https://pymysql.readthedocs.io/)
 
 ---
 
-## Security Notice
-
-**Do not commit production credentials or secrets.**  
-Current database and RabbitMQ connection details are for development only.
